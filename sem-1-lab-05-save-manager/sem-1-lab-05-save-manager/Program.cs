@@ -102,7 +102,7 @@ namespace sem_1_lab_05_save_manager
         {
             if (choice == "1")
             {
-                Console.WriteLine("Для просмотра данных сохранения ввести имя");
+                Console.WriteLine("\nДля просмотра данных сохранения ввести имя");
                 int i = 1;
                 foreach (SaveEntry index in indexes)
                 {
@@ -111,6 +111,7 @@ namespace sem_1_lab_05_save_manager
                     //i существует т.к. изначально случайно сделал переход к сохранению по номеру
                 }
                 Console.WriteLine("0. Назад");
+                Console.Write("Ввод: ");
                 string savemenu_choice = Console.ReadLine();
                 if (savemenu_choice == "0") return;
                 else
@@ -126,9 +127,9 @@ namespace sem_1_lab_05_save_manager
             }
             else
             {
-                Console.WriteLine("Некорректный ввод");
+                WarningColor("Некорректный ввод!", ConsoleColor.Red);
             }
-            
+
         }
         static void SaveActionsMenu(string savemenu_choice,List<SaveEntry> indexes)
         {
@@ -138,22 +139,23 @@ namespace sem_1_lab_05_save_manager
                 int current_index = indexes.IndexOf(index);
                 PrintSave(index, LoadSave("saves", index));
                 Console.WriteLine("\nВыберите действие\n1. Изменить данные сохранения\n2. Создать резервную копию\n3. Восстановить резервную копию\n4. Удалить сохранение\n0. Назад");
+                Console.Write("Ввод: ");
                 string saveaction_choice = Console.ReadLine();
                 SaveActions(saveaction_choice, indexes, current_index, savemenu_choice);
             }
-            catch (NullReferenceException) 
-            { 
-                Console.WriteLine("Такое сохранение не найдено!");
+            catch (NullReferenceException)
+            {
+                WarningColor("Файл сохранения не найден!", ConsoleColor.Red);
                 SavesMenu(indexes, "1");
             }
             catch (JsonException)
             {
-                Console.WriteLine("Ошибка чтения файла сохранения");
+                WarningColor("Ошибка чтения файла сохранения!", ConsoleColor.Red);
                 SavesMenu(indexes, "1");
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("Ошибка в указании пути до файла сохранения");
+                WarningColor("Ошибка в указании пути до файла в индексе!", ConsoleColor.Red);
             }
 
         }
@@ -180,7 +182,7 @@ namespace sem_1_lab_05_save_manager
                     SavesMenu(indexes, "1");
                     break;
                 default:
-                    Console.WriteLine("Некорректный ввод");
+                    WarningColor("Некорректный ввод!", ConsoleColor.Red);
                     SaveActionsMenu(savemenu_choice, indexes);
                     break;
                 
@@ -189,6 +191,7 @@ namespace sem_1_lab_05_save_manager
         static void ChangeSave(List<SaveEntry> indexes, int current_index,string saveaction_choice,string savemenu_choice)
         {
             Console.WriteLine("\nИзменение данных сохранения:\nЧто вы хотите изменить в сохранении?\n1. Карту\n2. Координаты\n3. Здоровье\n4. Предметы инвентаря\n0. Ничего");
+            Console.Write("Ввод: ");
             string choice = Console.ReadLine();
             SaveData current_save = LoadSave("saves", indexes[current_index]);
             switch (choice)
@@ -196,6 +199,7 @@ namespace sem_1_lab_05_save_manager
                 case "1":
                     
                     Console.WriteLine($"Текущая карта: {current_save.Map}\nВведите новое значение:");
+                    Console.Write("Ввод: ");
                     string new_map = Console.ReadLine();
                     if (new_map != "")
                     {
@@ -208,12 +212,14 @@ namespace sem_1_lab_05_save_manager
                     break;
                 case "2":
                     Console.WriteLine($"Текущие координаты: Х=({LoadSave("saves", indexes[current_index]).Position.x}),Y=({LoadSave("saves", indexes[current_index]).Position.y})\nВыбор координаты (x/y)");
+                    Console.Write("Ввод: ");
                     string xy = Console.ReadLine();
                     try
                     {
                         if (xy == "x")
                         {
                             Console.WriteLine("Новый X:");
+                            Console.Write("Ввод: ");
                             string new_x = Console.ReadLine();
                             if (new_x != "")
                             {
@@ -229,6 +235,7 @@ namespace sem_1_lab_05_save_manager
                         else if (xy == "y")
                         {
                             Console.WriteLine("Новый Y:");
+                            Console.Write("Ввод: ");
                             string new_y = Console.ReadLine();
                             if (new_y != "")
                             {
@@ -243,19 +250,20 @@ namespace sem_1_lab_05_save_manager
                         }
                         else
                         {
-                            Console.WriteLine("Некорректный ввод");
+                            WarningColor("Некорректный ввод!", ConsoleColor.Red);
                             ChangeSave(indexes, current_index, saveaction_choice, savemenu_choice);
                         }
                         break;
                     }
                     catch (FormatException)
                     {
-                        Console.WriteLine("Некорректный ввод");
+                        WarningColor("Некорректный ввод!", ConsoleColor.Red);
                         ChangeSave(indexes, current_index, saveaction_choice, savemenu_choice);
                     }
                     break;
                 case "3":
                     Console.WriteLine($"Текущее здоровье: {LoadSave("saves", indexes[current_index]).Health}\nВведите новое значение:");
+                    Console.Write("Ввод: ");
                     string new_HP = Console.ReadLine();
                     try
                     {
@@ -273,12 +281,13 @@ namespace sem_1_lab_05_save_manager
                     }
                     catch (FormatException)
                     {
-                        Console.WriteLine("Некорректный ввод");
+                        WarningColor("Некорректный ввод!", ConsoleColor.Red);
                         ChangeSave(indexes, current_index, saveaction_choice, savemenu_choice);
                     }
                     break;
                 case "4":
                     Console.WriteLine($"Текущий инвентарь: {string.Join(",",LoadSave("saves", indexes[current_index]).Inventory)}\nВведите чере запятую:");
+                    Console.Write("Ввод: ");
                     string new_inv = Console.ReadLine();
                     if (new_inv != "")
                     {
@@ -295,23 +304,32 @@ namespace sem_1_lab_05_save_manager
                 case "0":
                     SaveActionsMenu(savemenu_choice,indexes);break;
                 default:
-                    Console.WriteLine("Некорректный ввод");
+                    WarningColor("Некорректный ввод!", ConsoleColor.Red);
                     SaveActions(saveaction_choice, indexes, current_index, savemenu_choice);
                     break;
 
             }
         }
+        static void WarningColor(string text,ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine($"\n{text}\n");
+            Console.ForegroundColor = ConsoleColor.White;
+
+        }
+
         static void Main(string[] args)
         {
             if (Directory.Exists("saves") == false)
             {
-                Console.WriteLine("Папка сохранений не найдена, создаю новую...\n");
+                WarningColor("Папка сохранений не найдена, создаю новую...", ConsoleColor.Green);
                 Directory.CreateDirectory("saves");
             }
             if (Directory.Exists("backups") == false)
             {
-                Console.WriteLine("Папка бэкапов не найдена, создаю новую...\n");
+                WarningColor("Папка бэкапов не найдена, создаю новую...", ConsoleColor.Green);
                 Directory.CreateDirectory("backups");
+
             }
             try
             { 
@@ -319,18 +337,26 @@ namespace sem_1_lab_05_save_manager
 
                 while (true)
                 {
-                    Console.WriteLine("Менеджер сохранений\n \nВыберите действие: \n1. Просмотр сохранений\n0. Выйти");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("||===================||");
+                    Console.WriteLine("||Менеджер сохранений||");
+                    Console.WriteLine("||===================||\n");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    Console.WriteLine("Выберите действие: \n1. Просмотр сохранений\n0. Выйти");
+                    Console.Write("Ввод: ");
                     string choice = Console.ReadLine();
                     SavesMenu(indexes, choice);
                 }
             }
             catch (FileNotFoundException) 
             {
-                Console.WriteLine("\nФайл индекса не найден\n"); 
+                WarningColor("Файл индекса не найден!", ConsoleColor.Red);
             }
             catch (JsonException)
             {
-                Console.WriteLine("\nОшибка чтения файла индекса\n");
+                WarningColor("Ошибка чтения файла индекса", ConsoleColor.Red);
             }
         }
     }

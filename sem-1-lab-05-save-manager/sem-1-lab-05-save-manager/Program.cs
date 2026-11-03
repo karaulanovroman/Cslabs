@@ -84,19 +84,19 @@ namespace sem_1_lab_05_save_manager
         static void CreateBackup(string savesDirectory, string backupsDirectory, SaveEntry entry)
         {
             File.Copy($"{savesDirectory}/{entry.file}", $"{backupsDirectory}/{entry.file}", overwrite: true);
-            Console.WriteLine("Бэкап создан");
+            WarningColor("Бэкап создан", ConsoleColor.Green);
         }
         static void RestoreBackup(string savesDirectory, string backupsDirectory, SaveEntry entry)
         {
             File.Copy($"{backupsDirectory}/{entry.file}", $"{savesDirectory}/{entry.file}", overwrite: true);
-            Console.WriteLine("Бэкап восстановлен");
+            WarningColor("Бэкап восстановлен", ConsoleColor.Green);
         }
         static void DeleteSave(string savesDirectory, string indexPath, List<SaveEntry> entries, SaveEntry entry)
         {
             File.Delete($"{savesDirectory}/{entry.file}");
             entries.Remove(entry);
             SaveIndex(indexPath, entries);
-            Console.WriteLine("Сохранение удалено!");
+            WarningColor("Сохранение удалено", ConsoleColor.Green);
         }
         static void SavesMenu(List<SaveEntry> indexes,string choice)
         {
@@ -108,7 +108,6 @@ namespace sem_1_lab_05_save_manager
                 {
                     Console.WriteLine($"{Convert.ToString(i)}. {index.name} {index.file} {index.updatedAt}");
                     i++;
-                    //i существует т.к. изначально случайно сделал переход к сохранению по номеру
                 }
                 Console.WriteLine("0. Назад");
                 Console.Write("Ввод: ");

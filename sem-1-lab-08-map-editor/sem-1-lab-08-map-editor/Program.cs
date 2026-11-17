@@ -58,6 +58,14 @@ namespace sem_1_lab_08_map_editor
             }
             return false;
         }
+        public static bool IsPlayerOnCell(Position cell_pos,Position player_cell)
+        {
+            if(cell_pos.x == player_cell.x && cell_pos.y == player_cell.y)
+            {
+                return true;
+            }
+            return false;
+        }
         public char cell_type;
     }
     public class Map
@@ -260,51 +268,55 @@ namespace sem_1_lab_08_map_editor
         }
         static void MapRedMenu(Map map,Player player)
         {
-            Console.WriteLine("Выберите действие:\n0.Выйти\n1.Переместить игрока\n2.Изменить клетку\n3.Сохранить изменения\n4.сделать снимок карты\n5.Загрузить снимок\n6.Отобразить карту");
-            var c = Console.ReadLine();
-            if (c == "0")
+            try
             {
-                Map map2 = Map.LoadMap(map.name);
-                Player player2 = Player.FindPlayer(map2);
+                Console.WriteLine("Выберите действие:\n0.Выйти\n1.Переместить игрока\n2.Изменить клетку\n3.Сохранить изменения\n4.сделать снимок карты\n5.Загрузить снимок\n6.Отобразить карту");
+                var c = Console.ReadLine();
+                if (c == "0")
+                {
+                    Map map2 = Map.LoadMap(map.name);
+                    Player player2 = Player.FindPlayer(map2);
 
-                if (Map.MapCheck(map, map2, player, player2))
-                {
-                    LoadMenu();
+                    if (Map.MapCheck(map, map2, player, player2))
+                    {
+                        LoadMenu();
+                    }
+                    else
+                    {
+                        ExitWithoutSave(map, player);
+                    }
                 }
-                else
+                if (c == "1")
                 {
-                    ExitWithoutSave(map, player);
+                    MovePlayerMenu(map, player);
                 }
+                if (c == "2")
+                {
+                    ChangeCellMenu(map, player);
+                }
+                if (c == "2")
+                {
+                    ChangeCellMenu(map, player);
+                }
+                if (c == "3")
+                {
+                    SaveMenu(map, player);
+                }
+                if (c == "4")
+                {
+                    ShotSaveMenu(map, player);
+                }
+                if (c == "5")
+                {
+                    ShotLoadMenu(map, player);
+                }
+                if (c == "6")
+                {
+                    Map.RenderMap(map, player);
+                }
+                MapRedMenu(map, player);
             }
-            if (c == "1")
-            {
-                MovePlayerMenu(map,player);
-            }
-            if (c == "2")
-            {
-                ChangeCellMenu(map,player);
-            }
-            if (c == "2")
-            {
-                ChangeCellMenu(map, player);
-            }
-            if (c == "3")
-            {
-                SaveMenu(map, player);
-            }
-            if (c == "4")
-            {
-                ShotSaveMenu(map, player);
-            }
-            if (c == "5")
-            {
-                ShotLoadMenu(map, player);
-            }
-            if (c == "6")
-            {
-                Map.RenderMap(map, player);
-            }
-            MapRedMenu(map, player);
+            catch (Exception) { Console.WriteLine("Пока необработанная ошибка...");MapRedMenu(map, player); }
         }
         static void ShotSaveMenu(Map map, Player player)
         {
@@ -318,11 +330,15 @@ namespace sem_1_lab_08_map_editor
         }
         static void ShotLoadMenu(Map map,Player player)
         {
-            map = Map.LoadMap($"shots/{map.name}");
-            player = Player.FindPlayer(map);
-            Console.WriteLine("Снимок загружен");
-            Map.RenderMap(map, player);
-            MapRedMenu(map, player);
+            try
+            {
+                map = Map.LoadMap($"shots/{map.name}");
+                player = Player.FindPlayer(map);
+                Console.WriteLine("Снимок загружен");
+                Map.RenderMap(map, player);
+                MapRedMenu(map, player);
+            }
+            catch (FileNotFoundException) { Console.WriteLine("Снимок не найден!"); MapRedMenu(map, player); }
         }
         static void SaveMenu(Map map,Player player)
         {
@@ -364,8 +380,13 @@ namespace sem_1_lab_08_map_editor
                 Console.WriteLine("Y=");
                 int y = Convert.ToInt32(Console.ReadLine());
                 Position cell_pos = new Position { x = x - 1, y = y - 1 };
-                Console.WriteLine("Введите новый тип клетки");
+                Console.WriteLine("Введите новый тип клетки\nДоступные типы клеток:1.Вода W\n2.Стена #\n3.Земля .");
                 char new_cell_type = Convert.ToChar(Console.ReadLine());
+                if (new_cell_type == '#' && Cell.IsPlayerOnCell(cell_pos, player.player_pos))
+                {
+                    Console.WriteLine("Игрок окажется в стене!");
+                    ChangeCellMenu(map, player);
+                }
                 if (Cell.IsCell(new_cell_type))
                 {
                     Map.ChangeCellType(map, cell_pos, new_cell_type);
